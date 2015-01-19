@@ -1,0 +1,43 @@
+<?php if(!isset($verify)){ exit(); } ?>
+<?php
+if (isset($_POST['song'])){
+	if (isset($_POST['delete']))
+	{
+		$songid = mysqli_escape_string($dblink, $_POST['song']);
+		mysqli_query($dblink, "DELETE FROM data_music WHERE id='{$songid}' AND uid='{$_SESSION['id']}'");
+		header('location: '.$_POST['redirecturl']);
+	}
+	
+	if (isset($_POST['edit']))
+	{ 	$showedit = TRUE;
+	  	if (isset($_POST['songname']))
+	  	{
+  			$name = $dblink->real_escape_string($_POST['songname']);
+  			$artist = $dblink->real_escape_string($_POST['artist']);
+ 			$album = $dblink->real_escape_string($_POST['album']);
+			$songid = mysqli_escape_string($dblink, $_POST['song']);
+			$query = "UPDATE data_music SET name='{$name}', artist='{$artist}', album='{$album}' WHERE uid='{$_SESSION['id']}' AND id='{$songid}'";
+        	mysqli_query($dblink, $query) or die('failed');
+        	header('location: /music');
+        } else {
+       		$songid = mysqli_escape_string($dblink, $_POST['song']);
+       		$sql = "SELECT * FROM data_music WHERE uid='{$_SESSION['id']}' and id='$songid'";
+			$result = mysqli_query($dblink, $sql);
+			$songdata = mysqli_fetch_array($result);
+			
+			$sqlartists = "SELECT * FROM music_artists WHERE uid='{$_SESSION['id']}'";
+			$resultartists = mysqli_query($dblink, $sqlartists);
+			while ($artist = mysqli_fetch_array($resultartists))
+			{
+				$artists[] = $artist;
+			}
+			if (!isset($artists))
+			{
+				$artist['id'] = '';
+				$artist['name'] = 'No artists! please create one first';
+				$artists[] = $artists;
+			}
+        }
+    }	
+}
+?>

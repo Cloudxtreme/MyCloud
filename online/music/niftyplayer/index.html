@@ -1,0 +1,29 @@
+		<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0" width="165" height="37" id="niftyPlayer1" align="">
+		 <param name=movie value="niftyplayer.swf?file=betty.mp3&as=0">
+		 <param name=quality value=high>
+		 <param name=bgcolor value=#FFFFFF>
+		 <embed src="niftyplayer.swf?file=betty.mp3&as=0" quality=high bgcolor=#FFFFFF width="165" height="37" name="niftyPlayer1" align="" type="application/x-shockwave-flash" swLiveConnect="true" pluginspage="http://www.macromedia.com/go/getflashplayer">
+		</embed>
+		</object>
+		<p>...and it is controllable with JavaScript:</p>
+<script type="text/javascript" language="javascript" src="/music/niftyplayer/niftyplayer.js"></script>
+
+		<a href="javascript:niftyplayer('niftyPlayer1').playToggle()">play toggle</a>
+		(or
+		<a href="javascript:niftyplayer('niftyPlayer1').play()">play</a>
+		|
+		<a href="javascript:niftyplayer('niftyPlayer1').pause()">pause</a>
+		)
+		<a href="javascript:niftyplayer('niftyPlayer1').stop()">stop</a>
+		<br />
+		<a href="javascript:niftyplayer('niftyPlayer1').load('betty.mp3')">load file 1</a>
+		|
+		<a href="javascript:niftyplayer('niftyPlayer1').load('creeeeak.mp3')">load file 2</a>
+		|
+		<a href="javascript:niftyplayer('niftyPlayer1').loadAndPlay('creeeeak.mp3')">load file 2 and play it</a>
+		<br />
+		<br />
+		<a href="javascript:niftyplayer('niftyPlayer1').registerEvent('onPlay', 'alert(\'Playing!\')')">register onPlay event</a> (then click the play button to see the result)
+		<br />
+		<a href="javascript:alert(niftyplayer('niftyPlayer1').getState())">get current file state</a>
+	</div>

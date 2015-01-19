@@ -1,0 +1,42 @@
+<?php if(!isset($verify)){ exit(); } ?>
+<?php
+	if (isset($_POST['delete']))
+	{
+		$photoid = mysqli_escape_string($dblink, $_GET['edit']);
+		mysqli_query($dblink, "DELETE FROM data_photos WHERE id='{$photoid}' AND uid='{$_SESSION['id']}'");
+		 header('location: /photos');
+	}
+	
+	if (isset($_GET['edit']))
+	{ 	$showedit = TRUE;
+	  	if (isset($_POST['photoname']))
+	  	{
+  			$name = $dblink->real_escape_string($_POST['photoname']);
+  			$album = $dblink->real_escape_string($_POST['album']);
+ 			$album = $dblink->real_escape_string($_POST['album']);
+			$photoid = mysqli_escape_string($dblink, $_GET['edit']);
+			$description = mysqli_escape_string($dblink, $_POST['description']);
+			$query = "UPDATE data_photos SET name='{$name}', album='{$album}', description='{$description}' WHERE uid='{$_SESSION['id']}' AND id='{$photoid}'";
+        	mysqli_query($dblink, $query) or die('fail');
+        	header('location: /photos');
+        } else {
+       		$photoid = mysqli_escape_string($dblink, $_GET['edit']);
+       		$sql = "SELECT name, album,description,id,size,publicid FROM data_photos WHERE uid='{$_SESSION['id']}' and id='$photoid'";
+			$result = mysqli_query($dblink, $sql);
+			$photodata = mysqli_fetch_array($result);
+			
+			$sqlalbums = "SELECT * FROM photo_albums WHERE uid='{$_SESSION['id']}'";
+			$resultalbums = mysqli_query($dblink, $sqlalbums);
+			while ($album = mysqli_fetch_array($resultalbums))
+			{
+				$albums[] = $album;
+			}
+			if (!isset($albums))
+			{
+				$album['id'] = '';
+				$album['name'] = 'No albums! please create one first';
+				$albums[] = $albums;
+			}
+        }
+    }	
+?>

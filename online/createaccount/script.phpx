@@ -1,0 +1,88 @@
+<?php if(!isset($verify)){ exit(); } ?>
+<?php
+	@session_start();
+	$showform = TRUE;
+	if (isset($_SESSION['id'])) { header('location:/home'); exit(); }
+	$inputusername	= 'Username';
+	$inputfullname	= 'Full name';
+	$inputemail		= 'E-mail address';
+	
+	if (isset($_POST['formsubmited'])) {
+	$formverified = FALSE;
+	function checkEmail($email) {
+ 		if (!preg_match("/^( [a-zA-Z0-9] )+( [a-zA-Z0-9\._-] )*@( [a-zA-Z0-9_-] )+( [a-zA-Z0-9\._-] +)+$/" , $email)) {
+ 			return false;
+		}
+			return true;
+		}
+		$origusername	= $_POST['username'];
+		$origfullname 	= $_POST['fullname'];
+		$origemail		= $_POST['email'];
+		
+		if ($_POST['username'] == 'username') { $_POST['username'] = ''; }
+		if ($_POST['password'] == 'password') { $_POST['password'] = ''; }
+		if ($_POST['email'] == 'E-mail address') { $_POST['email'] = ''; }
+		if ($_POST['fullname'] == 'Full name') { $_POST['fullname'] = ''; }
+		require($_SERVER['DOCUMENT_ROOT'].'/../offline/dbconex.php');
+		$username = mysqli_escape_string($dblink, $_POST['username']);
+		$sql = "SELECT * FROM users WHERE username='{$username}'";
+		$result = mysqli_query($dblink, $sql);
+		$sql2 = "SELECT * FROM users WHERE email='{$_POST['email']}'";
+		$result2 = mysqli_query($dblink, $sql2);
+		$userdata = mysqli_fetch_array($result);
+		if (mysqli_num_rows($result) != 0) 
+		{
+			$title = '<span class="redsmall">Really sorry but that username is already taken</span>';
+		} else {
+			if (mysqli_num_rows($result2) != 0) {
+			$title = '<span class="redsmall">Really sorry but that e-mail is already taken</span>';
+		} else {
+			if(strlen($_POST['username']) < 1) {
+			$title = '<span class="redsmall">Really sorry you need to enter a username</span>';
+		} else {
+			if(strlen($_POST['password']) < 1) {
+			$title = '<span class="redsmall">Really sorry you need to enter a password</span>';
+		} else {
+			if(strlen($_POST['password']) < 5) {
+			$title = '<span class="redsmall">Really sorry but your password needs<br>to be at least 5 characters</span>';
+		} else {
+			if($_POST['password'] != $_POST['password2']) {
+			$title = '<span class="redsmall">Really sorry but your passwords don\'t match</span>';
+		} else {
+			if(strlen($_POST['fullname']) < 1) {
+			$title = '<span class="redsmall">Really sorry you need to enter your fullname</span>';
+		} else {
+			if(strlen($_POST['email']) == 0) {
+			$title = '<span class="redsmall">Really sorry you need to enter your<br>e-mail address</span>';
+		} else {
+			$emailexplode = explode('@', $_POST['email']);
+			if(isset($emailexplode[1])){ $emailexplode = explode('.', $emailexplode[1]); }
+			if (!isset($emailexplode[1])) {
+			$title = '<span class="redsmall">Really sorry but that\'s not an e-mail address</span>';
+		} else {
+			//start creating account
+			$newusername = mysqli_escape_string($dblink, $_POST['username']);
+			$newpassword = mysqli_escape_string($dblink, md5($_POST['password']));
+			$newfullname = mysqli_escape_string($dblink, $_POST['fullname']);
+			$newemail	 = mysqli_escape_string($dblink, $_POST['email']);
+			$iphoneid 	 = mysqli_escape_string($dblink, md5($newusername.'dfvjkqw'.time()));
+			mysqli_query($dblink, "INSERT INTO users (username, password, fullname, email, dalowed, iphoneid, lastpage) VALUES ('$newusername', '$newpassword', '$newfullname', '$newemail', '52428800', '{$iphoneid}', '/home')") or die("fail");
+			$showform = FALSE;
+			$formverified = TRUE;
+			//end creating account
+		}
+		
+		}}}}}}}}} else {
+			$title = 'Creating an account is easy!<br>Simply fill in the fields below';
+			$formverified = TRUE;
+			}
+	
+	if (!$formverified){
+		if ($origusername != '') 		{ $inputusername	= $origusername; }
+		if ($origfullname != '') 		{ $inputfullname	= $origfullname; }
+		if ($origemail != '') 			{ $inputemail		= $origemail; }
+	}
+	
+	$pagetitle = 'Create account';
+	$config['bypassvalidation'] = TRUE;
+?>

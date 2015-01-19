@@ -1,0 +1,51 @@
+<?php if(!isset($verify)){ exit(); } ?>
+<?php
+if ($user['id'] != 1){ header('location: /home'); }
+$htmluser = '';
+$error = '';
+if (isset($_POST['user']))
+{
+	$htmluser = htmlspecialchars($_POST['user']);
+	$phpuser = $_POST['user'];
+	$showall = TRUE;
+	$sql = "SELECT * FROM users WHERE username='{$phpuser}'";
+	$result = mysqli_query($dblink, $sql);
+	$edituser = mysqli_fetch_array($result);
+	
+	if (mysqli_num_rows($result) == 0)
+	{
+		$error = 'User not found!';
+		unset($showall);
+	} else {
+		if (isset($_POST['changespace']) && is_numeric($_POST['changespace']))
+		{
+			$newspace = $_POST['changespace']*1024*1024;
+			$sql = "UPDATE users SET dalowed='$newspace' WHERE username='$phpuser'";
+			mysqli_query($dblink, $sql);
+			$sql = "SELECT * FROM users WHERE username='{$phpuser}'";
+			$result = mysqli_query($dblink, $sql);
+			$edituser = mysqli_fetch_array($result);
+		}
+		if (isset($_POST['addspace']) && is_numeric($_POST['addspace']))
+		{
+			$newspace = $_POST['addspace']*1024*1024;
+			$newspace = $newspace+$edituser['dalowed'];
+			$sql = "UPDATE users SET dalowed='$newspace' WHERE username='$phpuser'";
+			mysqli_query($dblink, $sql);
+			$sql = "SELECT * FROM users WHERE username='{$phpuser}'";
+			$result = mysqli_query($dblink, $sql);
+			$edituser = mysqli_fetch_array($result);
+		}
+		
+		$htmlname = $edituser['fullname'];
+		$htmlspace = $edituser['dalowed'];
+		
+		$userbackup = $user;
+		$user = $edituser;
+		calculatedata();
+		$htmlused = $datausage['used'];
+		$user = $userbackup;
+		calculatedata();
+	}
+}
+?>

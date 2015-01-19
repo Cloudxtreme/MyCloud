@@ -1,0 +1,149 @@
+html 						{ height:100%; }
+body						{ font-family:arial; font-size:13px; background-color:#888888; margin:0; padding:0; height:100%; background-image:url('/images/background.png'); background-position: center; background-repeat:repeat-y; }
+img							{ border:0; }
+a							{ color:#eeeeee; text-decoration:none; }
+a:hover						{ text-decoration:underline; }
+a.nohover:hover				{ text-decoration:none !important; }
+a:focus						{ outline: 0 !important; }
+
+#bodycontainer				{ padding:0px; margin:0px; width:100%; height:100%;  }
+#bodycontent				{ padding:0px; margin:0px; width:902px; min-height:100%; background-color:#999999; margin:0 auto; }
+
+#head						{ padding-bottom:10px; clear:both; margin:0; }
+.normal #logo				{ margin: 20px 0 0 30px; float:left; display:block; }
+.login #logo				{ margin:0 auto; padding-top:8px; display:block; }
+#icons						{ float:right; margin: 0 50px 0 0; }
+#musicicon					{ margin: 31px 0 0 50px; }
+#photoicon					{ margin: 38px 0 0 50px; }
+#documenticon				{ margin: 31px 0 0 50px; }
+
+#iconshome					{ margin:0 auto; margin: 0 50px 0 0; }
+#musiciconhome				{ margin: 0 0 0 50px; }
+#photoiconhome				{ margin: 0 0 0 50px; }
+#documenticonhome			{ margin: 0 0 0 50px; }
+#headbar					{ height:5px; width:850px; background-color:#888888; margin:0 auto; }
+
+#pagecontent				{ padding:10px; }
+#footercontainer			{ background-color:#aaa; height:30px; width:100%; background-image:url('/images/footer.png'); background-repeat:repeat-x;}
+#footer						{ height:29px; width:900px; margin:0 auto; font-family:arial; color:#ffffff; font-size:12px; padding-top:1px; }
+#footer .lefttext			{ padding-left:10px; padding-top:8px; color:#eeeeee; float:left; }
+#footer .righttext			{ padding-right:10px; padding-top:8px; color:#eeeeee; float:right; }
+#footer #footlinks			{ float:left; padding-top:8px; font-size:12px; padding-left:50px; }
+#footer #footlinks ul		{ padding:0; margin:0; }
+#footer #footlinks ul li	{ float:left; list-style:none; padding-right:17px;}
+
+.login input				{ color:#888; width:297px; height:30px; padding-left:3px; font-size:15px; }
+.login input.createinput	{ color:#000; }
+.login input.submit			{ color:#000000; width:100%; padding-top:0; height:30px; font-size:16px; font-weight:bold; }
+#password-password			{ color:#000000; display:none; }
+#password-clear				{ color:#888888; }
+#password2-password			{ color:#000000; display:none; }
+#password2-clear			{ color:#888888; }
+.login td.submit			{ padding-top:5px; }
+.login td.newaccount		{ padding-top:10px; font-weight:bolder; font-size:16px; text-align:right; }
+.login #logintable			{ margin:0 auto; }
+.login .welcome				{ padding-bottom:10px; font-weight:bold; text-align:center; font-size:20px; }
+.red						{ color:#aa3333; }
+.redsmall					{ color:#aa3333; font-size:14px; }
+.small						{ font-size:12px; }
+#docs .docsdate				{ text-align:right; width:150px;}
+#docs .docssize				{ text-align:right; width:60px;}
+#name						{ width:300px; }
+.songname					{ width:200px; }
+.songname.title				{ font-weight:bold;}
+#artistname					{ width:800px; }
+#artistname.title			{ font-weight:bold; }
+.albumartist				{ width:170px; }
+.albumartist.title			{ width:170px; font-weight:bold; }
+.button						{ padding-left:3px; }
+.button.first				{ padding-left:10px; }
+.title .date				{ font-weight:bold; padding-bottom:6px; text-align:right; }
+.title .size				{ font-weight:bold; padding-bottom:6px; text-align:right; }
+.title .songcount			{ font-weight:bold; padding-bottom:6px; }
+.title #name				{ font-weight:bold; padding-bottom:6px; }
+#docname					{ padding:0; margin:0; width:877px; font-size:15px; margin-bottom:5px; }
+.backlink					{ font-weight:bold; color:#eeeeee; padding:3px; float:left; }
+.lastsaved					{ float:right; color:#eeeeee; }
+.docname					{ float:left; margin-left:5px; font-weight:bold; color:#eeeeee; }
+.tblaltrow					{ background-color:#aaa; }
+#docs						{ border-collapse:separate; border-spacing:0px; }
+#createdoc					{ float:right; }
+.a100						{ width: 700px; }
+#documentdisplay			{ width: 870px; height:500px; padding:0px; margin: 0 auto; background-color:#fff; margin-top:17px; overflow:auto; }
+
+#databar					{ width:200px; height:12px; border:1px solid #999; background-color:#888; float:left; margin-right:40px; overflow:hidden; }
+#innerdatabar				{ height:12px; background-color:#aaa; padding:0; margin:0; }
+#innerdatabar #percent		{ color:#222; margin-left:4px; padding-top:0px; font-size:10px; }
+
+#created					{ padding:0; margin:0; float:right; }
+.big.databar				{ width:880px; height:30px; border:1px solid #999; background-color:#888; float:left; margin-right:40px; overflow:hidden; margin-bottom:10px; }
+.big .innerdatabar			{ height:30px; background-color:#aaa; padding:0; margin:0; }
+.big .innerdatabar .percent	{ color:#222; margin-left:4px; margin-top:5px; display:inline-block; font-size:20px; }
+
+.datalabel					{ width:150px; }
+.editbox input				{ padding:0; background-color:#999; margin:0; border:1px solid #888; outline:none;  }
+.tblsmall					{ font-size:11px; padding-bottom:5px;}
+.tblheader					{ font-size:15px; font-weight:bold; padding-bottom:5px; }
+.editbox.pass a				{ font-size:11px; color:#000 !important; text-decoration:underline;}
+
+#publicdocpass .contain		{ margin: 0 auto; width:305px; display:block; }
+#publicdocpass .contain .submit	{ width:100%; margin-top:5px; }
+#publicdocpass				{ width:100%; margin-top:20px;}
+
+.sharetitle					{ width:150px; }
+.sharesubmit				{ padding-bottom:10px; }
+.blacklink					{ color:#000; }
+
+.editbox.email 				{ padding-top:0; margin-top:0px; margin-right:10px; }
+.emailsend input			{ font-size:10px; height:15px; margin-right:10px; }
+.emailtd					{ padding-top:10px; }
+.center						{ display:block; margin:0 auto; width:300px; }
+.long						{ width:400px; }
+h3.reset					{ font-size:16px; }
+h3.reset .back				{ font-size:14px; margin-top:5px; float:right; }
+.right						{ float:right; }
+#reset						{ width:130px; color:#000; }
+
+.admintitle					{ width:100px; }
+.adminspace					{ padding-top:10px; }
+
+#player						{ float:right; }
+#musicplay					{ margin-right:10px; }
+.top10						{ padding-top:10px; }
+.uploadform	input			{ width:97%; }
+.uploadform	.submit			{ width:100%; }
+.uploadform	select			{ width:100%; }
+.uploadlabel				{ width:100px; }
+
+
+#photoscontainer 			{ min-width:950px; overflow-y:visible; overflow-x:hidden; }
+#musiccontainer 			{ width:880px; outline:none; max-height:400px; overflow-y:auto; overflow-x:hidden;padding-right:5px;}
+#imagetitle					{ font-weight:bold; text-align:center; width:880px; color:#fff; }
+#imageedit					{ color:#fff; text-align:right; float:right; margin-right:3px;margin-bottom:4px; font-weight:bold; }
+.backimages					{ text-align:left; float:left; margin-left:3px; margin-bottom:4px; font-weight:bold; }
+div.img 					{ margin:2px;margin-bottom:5px;border:none;float:left;text-align:center; }
+div.img img					{ display:inline;margin:3px;border:3px solid #aaa; }
+div.img a:hover img			{ border:3px solid #fff; }
+div.desc					{ text-align:center;font-weight:normal;width:210px;margin:2px; }
+#imagedesciption			{ 	display:none; text-align:center; width:500px; margin:0 auto; padding:3px; border-bottom:5px solid #aaa;
+								border-left:5px solid #aaa; border-right:5px solid #aaa;
+							}
+
+#aboutdiv					{ margin:0 auto; width:700px; text-align:justify; }
+#imageloading				{ margin-top:50px; color:#fff; font-weight:bold; text-align:center; }
+
+#songname					{ margin:0 auto; text-align:center; font-weight:bold; }
+.playing					{ font-weight:bold; }
+.pointer					{ cursor:pointer; }
+
+.inline						{ display: inline; }
+.floatright					{ float: right; }
+.searchinput				{ 	color:#444; font-weight:bold; margin-right:30px; background-color:#aaa; border:3px solid #888;
+								background-image:url('/images/search.png'); background-position: center right; background-repeat:no-repeat;
+								padding-right:25px; width:150px;
+							}
+.searchinput:focus			{ outline: none; }
+.greyinput					{ color:#777 !important; font-weight:normal !important; }
+.black						{ color:#000 !important; }
+
+#playerhead					{ padding-bottom:30px; }

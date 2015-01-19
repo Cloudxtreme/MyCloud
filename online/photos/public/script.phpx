@@ -1,0 +1,19 @@
+<?php if(!isset($verify)){ exit(); } ?>
+<?php
+if (isset($_GET['photoid']))
+{
+	$imageid = mysqli_escape_string($dblink, $_GET['photoid']);
+	$sql = "SELECT id, name, album, description FROM data_photos WHERE publicid='{$imageid}'";
+	$result = mysqli_query($dblink, $sql) or die($sql);
+	if (mysqli_num_rows($result) > 0)
+	{
+		$imagedata = mysqli_fetch_array($result);
+		$showimage = TRUE;
+		$pagetitle = $imagedata['name'];
+	} else {	
+		$error = '<center><h3>Something went wrong!</center></h3>';
+	}
+} else {
+	$error = '<center><h3>Something went wrong!</center></h3>';
+}
+?>

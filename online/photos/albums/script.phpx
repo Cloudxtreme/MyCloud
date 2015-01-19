@@ -1,0 +1,69 @@
+<?php if(!isset($verify)){ exit(); } ?>
+<?php
+function tblclass($i)
+{
+if ($i%2==0){ return ' class="pointer tblaltrow"'; } else { return ' class="pointer"'; }
+}
+
+if (isset($_POST['album'])){
+	$showalbums = FALSE;
+	if(isset($_POST['edit'])){
+		$albumitle = mysqli_fetch_array(mysqli_query($dblink, "SELECT name FROM photo_albums WHERE id='{$_POST['album']}' AND uid='{$_SESSION['id']}'"));
+		$htmlalbumname = $albumitle['name'];
+	}
+	if (isset($_POST['albumname']))
+	{
+		$newname = mysqli_escape_string($dblink, $_POST['albumname']);
+		$albumid = mysqli_escape_string($dblink, $_POST['album']);
+		mysqli_query($dblink, "UPDATE photo_albums SET name='$newname' WHERE id='{$albumid}' AND uid='{$_SESSION['id']}'");
+		$showalbums = TRUE;
+		unset($_POST['album']);
+	}
+	if (isset($_POST['delete']))
+	{
+		$albumid = mysqli_escape_string($dblink, $_POST['album']);
+		mysqli_query($dblink, "DELETE FROM photo_albums WHERE id='{$albumid}' AND uid='{$_SESSION['id']}'");
+		mysqli_query($dblink, "DELETE FROM data_photos WHERE album='{$albumid}' AND uid='{$_SESSION['id']}'");
+		$showalbums = TRUE;
+		unset($_POST['album']);
+	}
+
+}
+if (!isset($_POST['album'])){
+$showalbums = TRUE;
+//$sql = "SELECT * FROM photo_albums where uid='{$_SESSION['id']}' ORDER BY name";
+$sql = "SELECT
+		 photo_albums.name
+		,photo_albums.id
+		,count(data_photos.id) as photos
+			FROM photo_albums
+				left join data_photos
+					on data_photos.album = photo_albums.id
+			WHERE photo_albums.uid = '{$_SESSION['id']}'
+			GROUP BY photo_albums.id
+			ORDER BY photo_albums.name;
+";
+$result = mysqli_query($dblink, $sql) or die(mysqli_error($dblink));
+$i = 0;
+
+while ($albumdata = mysqli_fetch_array($result))
+{
+$albums[] = $albumdata;
+$i++;
+}
+
+
+}
+
+	if (isset($_POST['new']))
+	{
+		mysqli_query($dblink, "INSERT INTO photo_albums (uid, name, new) VALUES ('{$_SESSION['id']}', '', '1')") or die('fail');
+		$showalbums = FALSE;
+		$albumitle = mysqli_fetch_array(mysqli_query($dblink, "SELECT name,id FROM photo_albums WHERE new='1' AND uid='{$_SESSION['id']}'"));
+		$htmlalbumname = $albumitle['name'];
+		$_POST['album'] = $albumitle['id'];
+		mysqli_query($dblink, "UPDATE photo_albums SET new='0' WHERE id='{$albumitle['id']}'");
+	}
+
+$pagetitle = 'Photos';
+?>

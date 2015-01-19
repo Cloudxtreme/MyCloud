@@ -1,0 +1,73 @@
+<?php if(!isset($verify)){ exit(); } ?>
+<?php
+if (!isset($_GET['iphoneid'])){ exit(); }
+require($_SERVER['DOCUMENT_ROOT'].'/../offline/dbconex.php');
+@session_start();
+
+$iphoneid = mysqli_escape_string($dblink, $_GET['iphoneid']);
+$id = mysqli_fetch_array(mysqli_query($dblink, "SELECT id FROM users WHERE iphoneid='{$iphoneid}'"));
+$_SESSION['id'] = $id['id'];
+if (isset($_SESSION['id']))  {
+	$sql = "SELECT * FROM users WHERE id='{$_SESSION['id']}'";
+	$result = mysqli_query($dblink, $sql);
+	$user = mysqli_fetch_array($result);
+}
+
+function tblclass($i)
+{
+if ($i%2==0){ return ' class="tblaltrow"'; } else { return ''; }
+}
+
+function formatBytes($size, $precision = 2)
+{
+	if ($size == 0) { return '0B'; }
+    $base = log($size) / log(1024);
+    $suffixes = array('B', 'k', 'MB', 'GB', 'TB');   
+
+    return round(pow(1024, $base - floor($base)), $precision) . $suffixes[floor($base)];
+}
+
+function dategen($getdate) {
+	if ($getdate == '0000-00-00 00:00:00'){ return 'Never'; }
+	$unixdate = strtotime($getdate);
+	if (date("Ymd", $unixdate) == date("Ymd"))
+	{ //it is the same day
+		return 'Today, '.date("g:i a", $unixdate);
+	} elseif (date("Ymd", $unixdate) == date("Ymd", strtotime('-1 day')))
+	{ //it was edited yesterday
+		return 'Yesterday, '.date("g:i a", $unixdate);
+	} elseif (date("YW", $unixdate) == date("YW"))
+	{ //within the last week
+		return date("l, g:i a", $unixdate);
+	} elseif (date("Y", $unixdate) == date("Y"))
+	{ //within the last year
+		return date("d/m, g:i a", $unixdate);
+	} else {
+		return date("d/m/Y, g:i a", $unixdate);
+	}
+}
+
+
+
+$allowedorder = array("name", "artist", "album", "lastplayed", "uploaded", "size");
+if (!isset($_GET['order']) || !in_array($_GET['order'], $allowedorder)) { $_GET['order'] = 'artist'; }
+if (isset($_GET['artist'])) { $mysqlartist = mysqli_escape_string($dblink, $_GET['artist']); $artistfind = " AND artist='$mysqlartist'"; } else { $artistfind = ''; }
+$sql = "SELECT id,name,uid,size,uploaded,lastplayed,artist,album FROM data_music where uid='{$_SESSION['id']}'$artistfind ORDER BY {$_GET['order']}, name";
+$result = mysqli_query($dblink, $sql);
+$i = 0;
+while ($musicdata = mysqli_fetch_array($result))
+{
+	$song['jscriptid'] = $i;
+	$song['name'] = $musicdata['name'];
+	$song['size'] = $musicdata['size'];
+	$song['id']   = $musicdata['id'];
+	$song['lastplayed'] = $musicdata['lastplayed'];
+	$song['uploaded'] = $musicdata['uploaded'];
+	$song['album'] = $musicdata['album'];
+	$artistinfo = mysqli_fetch_array(mysqli_query($dblink, "SELECT * FROM music_artists where id='{$musicdata['artist']}' AND uid='{$_SESSION['id']}'"));
+	$song['artist'] = $artistinfo['name'];
+$songs[] = $song;
+$i++;
+}
+$pagetitle = 'Music';
+?>

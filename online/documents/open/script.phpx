@@ -1,0 +1,138 @@
+<?php if(!isset($verify)){ exit(); } ?>
+<?php
+
+if (isset($_POST['createdoc']))
+{
+$datetime = date("Y-m-d H:i:s");
+$readdate = date("j/n g:i");
+$sql = "INSERT INTO data_documents SET name = 'untitled $readdate', data = '', created='$datetime', hasopened='0',size='0', uid='{$_SESSION['id']}'";
+mysqli_query($dblink, $sql);
+header('location: /documents');
+}
+
+if (isset($_POST['delete']))
+{
+if (mysqli_num_rows(mysqli_query($dblink, "SELECT * FROM data_documents WHERE id='{$_POST['doc']}' AND uid='{$_SESSION['id']}'")) > 0){
+mysqli_query($dblink, "DELETE FROM data_documents WHERE id='{$_POST['doc']}' AND uid='{$_SESSION['id']}'");
+mysqli_query($dblink, "DELETE FROM shared_documents WHERE documentid='{$_POST['doc']}'") or die('fail');
+}
+header('location: /documents');
+}
+
+if (isset($_POST['sendemail']))
+{
+$emailaddress = $_POST['sendemail'];
+$emailexplode = explode('@', $emailaddress); if(isset($emailexplode[1])){ $emailexplode = explode('.', $emailexplode[1]); }
+if (!isset($emailexplode[1])) { $emailerror = 'That is not a valid e-mail address'; } else {
+$sharesql = mysqli_query($dblink, "SELECT * FROM shared_documents WHERE documentid='{$_POST['edit']} LIMIT 1'");
+$sharetable = mysqli_fetch_array($sharesql);
+$htmlurl = 'http://mycloud.jyelewis.com/shared/?documentid='.$sharetable['urlid'];
+$message = "{$user['fullname']} has shared a document with you!\nto view the document go to \n$htmlurl\nand enter the password \"{$sharetable['password']}\"\n\nPowered by My Cloud";
+
+$to      = $emailaddress;
+$subject = "{$user['fullname']} has shared a document with you!";
+$headers = 'From: '.$user['fullname'].' via My Cloud <noreply@jyelewis.com>' . "\r\n" .
+    'X-Mailer: PHP/' . phpversion();
+
+if (mail($to, $subject, $message, $headers)){ $emailerror = 'Successfully send email'; } else { $emailerror = 'Unable to send e-mail - please try again later'; }
+}
+$share = TRUE;
+} else {
+$emailerror = '';
+}
+
+if (isset($_POST['sharepassword']))
+{
+	$docsql = mysqli_fetch_array(mysqli_query($dblink, "SELECT uid FROM data_documents WHERE id='{$_POST['edit']} LIMIT 1'"));
+	if ($docsql['uid'] == $_SESSION['id'])
+	{
+		if (isset($_POST['sharecheckbox'])){ $documentshare = TRUE; } else { $documentshare = FALSE; }
+		$documentpass = $_POST['sharepassword'];
+		$sharesql = mysqli_query($dblink, "SELECT * FROM shared_documents WHERE documentid='{$_POST['edit']} LIMIT 1'");
+		if (mysqli_num_rows($sharesql) > 0) {
+			$sharetable = mysqli_fetch_array($sharesql);
+			$newpassword = mysqli_escape_string($dblink, $_POST['sharepassword']);
+			if ($documentshare)	 { $sql = "UPDATE shared_documents SET password='$newpassword' WHERE id='{$sharetable['id']}'"; }
+			if (!$documentshare) { $sql = "DELETE FROM shared_documents WHERE documentid='{$_POST['edit']}'"; }
+		} else {
+			$urlid = md5($_POST['edit'].'rAnd0meNcrip+q3rg');
+			$newpassword = mysqli_escape_string($dblink, $_POST['sharepassword']);
+			if ($documentshare)	 { $sql = "INSERT INTO shared_documents (urlid, documentid, password) VALUES ('$urlid', '{$_POST['edit']}', '$newpassword')"; }
+			if (!$documentshare) { $sql = "SELECT id FROM shared_documents WHERE id='0'"; }
+		} mysqli_query($dblink, $sql) or die($sql);
+	}
+		
+}
+
+if (isset($_POST['docid']) && is_numeric($_POST['docid'])) {
+	$showeditor = TRUE;
+	$documentdisplay = FALSE;
+	$docid = mysqli_real_escape_string($dblink, $_POST['docid']);
+	$docname =  mysqli_real_escape_string($dblink, $_POST['docname']);
+	$docdata =  mysqli_real_escape_string($dblink, $_POST['docdata']);
+	$datetime = date("Y-m-d H:i:s");
+	$datasize = strlen($_POST['docdata']);
+	if ($datausage['remaining'] > $datasize) {
+		$sql = "UPDATE data_documents SET name = '$docname', data = '$docdata', edited = '$datetime',size = '$datasize' WHERE id = '$docid' AND uid = '{$_SESSION['id']}'";
+		mysqli_query($dblink, $sql);
+		$saved = 'Last saved: '.date("g:i a");
+	} else {
+		$saved = 'Can not save! not enough space! Document to big by '.formatBytes($datasize - $datausage['remaining']);
+		$keepdata = $_POST['docdata'];
+		$keepname = $_POST['docname'];
+		$keepid = $_POST['docid'];
+	}
+	$_POST['edit'] = $_POST['docid'];
+	$_POST['Open'] = 'Open';
+} else {
+	$saved = '';
+}
+
+if (isset($_POST['edit']) && is_numeric($_POST['edit']) && isset($_POST['edit'])) {
+	if (!isset($keepdata)){
+		$sql = "SELECT * FROM data_documents WHERE uid='{$_SESSION['id']}' AND id='{$_POST['edit']} LIMIT 1'";
+		$result = mysqli_query($dblink, $sql);
+		$content = mysqli_fetch_array($result);
+		$editorcontent = $content['data'];
+		$docid = $content['id'];
+		$docname = $content['name'];
+	} else {
+		$editorcontent = $keepdata;
+		$docid = $keepid;
+		$docname = $keepname;
+	}
+	$datetime = date("Y-m-d H:i:s");
+	$sql = "UPDATE data_documents SET opened = '$datetime', hasopened = 1 WHERE id = '{$_POST['edit']}' AND uid = '{$_SESSION['id']}'";
+	mysqli_query($dblink, $sql);
+}
+
+if (isset($_POST['edit']) && is_numeric($_POST['edit']) && isset($_POST['Open'])) {
+$showeditor = TRUE;
+$documentdisplay = FALSE;
+}
+
+if (isset($_POST['edit']) && is_numeric($_POST['edit']) && isset($_POST['share'])) {
+	$docsql = mysqli_fetch_array(mysqli_query($dblink, "SELECT uid FROM data_documents WHERE id='{$_POST['edit']} LIMIT 1'"));
+	if ($docsql['uid'] == $_SESSION['id'])
+	{
+		$sharesql = mysqli_query($dblink, "SELECT * FROM shared_documents WHERE documentid='{$_POST['edit']} LIMIT 1'");
+		if (mysqli_num_rows($sharesql) > 0)
+		{
+			$sharetable = mysqli_fetch_array($sharesql);
+			$htmlchecked = 'checked';
+			$htmlpass = $sharetable['password'];
+			$htmlurl = 'http://mycloud.jyelewis.com/shared/?documentid='.$sharetable['urlid'];
+			$isshared = TRUE;
+		} else { $htmlchecked = ''; $htmlpass = ''; $isshared = FALSE; }
+		$htmldocid = $_POST['edit'];
+		$showeditor = FALSE;
+		$share = TRUE;
+	}
+	}
+if (isset($showeditor) && $showeditor) {
+	echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">';
+	require($_SERVER['DOCUMENT_ROOT'].'/../offline/tinymce.php');
+	$pagetitle = htmlentities($docname).' - Documents';
+}
+if (!isset($pagetitle)){$pagetitle = 'Documents';}
+?>

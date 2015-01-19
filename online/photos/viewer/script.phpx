@@ -1,0 +1,28 @@
+<?php if(!isset($verify)){ exit(); } ?>
+<?php
+if (isset($_GET['imageid']))
+{
+	$imageid = mysqli_escape_string($dblink, $_GET['imageid']);
+	$sql = "SELECT id, name, album, description FROM data_photos WHERE id='{$imageid}' AND uid='{$_SESSION['id']}'";
+	$result = mysqli_query($dblink, $sql);
+	if (mysqli_num_rows($result) > 0)
+	{
+		if (isset($_SERVER['HTTP_REFERER'])){ $backlink = $_SERVER['HTTP_REFERER']; } else { $backlink = '/photos'; }
+		$imagedata = mysqli_fetch_array($result);
+		$imagealbum = mysqli_fetch_array(mysqli_query($dblink, "SELECT name FROM photo_albums WHERE id='{$imagedata['album']}'"));
+		$imagedata['album'] = $imagealbum['name'];
+		if ($imagedata['album'] != ''){
+			$imagedata['htmlname'] = $imagedata['name'].' - '.$imagedata['album'];
+		} else {
+			$imagedata['htmlname'] = $imagedata['name'];
+		}
+		$showimage = TRUE;
+		$pagetitle = $imagedata['name'].' - Photos';
+	} else {	
+		header('location: /photos');
+	}
+} else {
+	header('location: /photos');
+}
+if (!isset($pagetitle)){$pagetitle = 'Photos';}
+?>

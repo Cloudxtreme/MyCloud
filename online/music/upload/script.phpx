@@ -1,0 +1,39 @@
+<?php if(!isset($verify)){ exit(); } ?>
+<?php
+	if (isset($_GET['artistid'])) { $toselect = $_GET['artistid']; }
+  	if (isset($_FILES['uploaded_file']['type'])){
+  	$toselect = $_POST['artist'];
+  	$allowedmimes = array('audio/mpeg', 'audio/mp3', 'audio/basic', 'audio/x-aiff', 'audio/wav', 'audio/x-wav');
+  		if(in_array($_FILES['uploaded_file']['type'], $allowedmimes))
+  		{
+  		$name = $dblink->real_escape_string($_POST['songname']);
+  		$artist = $dblink->real_escape_string($_POST['artist']);
+  		$album = $dblink->real_escape_string($_POST['album']);
+        $data = $dblink->real_escape_string(file_get_contents($_FILES['uploaded_file']['tmp_name']));
+        $size = intval($_FILES['uploaded_file']['size']);
+        // Create the SQL query
+        if ($datausage['remaining'] > $size)
+        	{
+        	$query = "
+           	 INSERT INTO data_music (
+           	     `uid`, `name`, `size`, `artist`, `album`, `data`, `uploaded`
+           	 )
+           	 VALUES (
+           	     '{$_SESSION['id']}', '{$name}', {$size}, '{$artist}', '{$album}', '{$data}', NOW()
+           	 )";
+        	mysqli_query($dblink, $query) or die('failed');
+        	$messageup = 'Song uploaded!';
+        	} else { $messageup = 'You do not have enough space to upload that file'; }
+    	} else { $messageup = 'only audio files can be uploaded (not '.$_FILES['uploaded_file']['type'].')'; }
+    }
+
+
+$sql = "SELECT * FROM music_artists WHERE uid='{$_SESSION['id']}'";
+$result = mysqli_query($dblink, $sql);
+while ($artist = mysqli_fetch_array($result))
+{
+$artists[] = $artist;
+}
+
+$pagetitle = 'Music';
+?>

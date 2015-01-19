@@ -1,0 +1,74 @@
+<?php if(!isset($verify)){ exit(); } ?>
+<?php
+function tblclass($i)
+{
+if ($i%2==0){ return ' class="pointer tblaltrow"'; } else { return ' class="pointer"'; }
+}
+
+if (isset($_POST['artist'])){
+	$showartists = FALSE;
+	if(isset($_POST['edit'])){
+		$artistitle = mysqli_fetch_array(mysqli_query($dblink, "SELECT name FROM music_artists WHERE id='{$_POST['artist']}' AND uid='{$_SESSION['id']}'"));
+		$htmlartistname = $artistitle['name'];
+	}
+	if (isset($_POST['artistname']))
+	{
+		$newname = mysqli_escape_string($dblink, $_POST['artistname']);
+		$artistid = mysqli_escape_string($dblink, $_POST['artist']);
+		mysqli_query($dblink, "UPDATE music_artists SET name='$newname' WHERE id='{$artistid}' AND uid='{$_SESSION['id']}'");
+		$showartists = TRUE;
+		unset($_POST['artist']);
+	}
+	if (isset($_POST['delete']))
+	{
+		$artistid = mysqli_escape_string($dblink, $_POST['artist']);
+		mysqli_query($dblink, "DELETE FROM music_artists WHERE id='{$artistid}' AND uid='{$_SESSION['id']}'");
+		mysqli_query($dblink, "DELETE FROM data_music WHERE artist='{$artistid}' AND uid='{$_SESSION['id']}'");
+		$showartists = TRUE;
+		unset($_POST['artist']);
+	}
+
+}
+if (!isset($_POST['artist'])){
+$showartists = TRUE;
+//$sql = "SELECT name FROM music_artists where uid='{$_SESSION['id']}' ORDER BY name";
+//$sql = "SELECT COUNT(*) AS num FROM data_music GROUP BY artists";
+$sql = "SELECT
+		 music_artists.name
+		,music_artists.id
+		,count(data_music.id) as songs
+			FROM music_artists
+				left join data_music
+					on data_music.artist = music_artists.id
+			WHERE music_artists.uid = '{$_SESSION['id']}'
+			GROUP BY music_artists.id
+			ORDER BY music_artists.name;
+";
+
+$result = mysqli_query($dblink, $sql) or die(mysqli_error($dblink));
+$i = 0;
+
+while ($artistdata = mysqli_fetch_array($result))
+{
+$artist['name'] = $artistdata['name'];
+$artist['id'] = $artistdata['id'];
+//$sql = "SELECT id FROM data_music where artist='{$artistdata['id']}'";
+//$numsongs = mysqli_num_rows(mysqli_query($dblink, $sql));
+$artists[] = $artistdata;
+$i++;
+}
+
+
+}
+
+	if (isset($_POST['new']))
+	{
+		mysqli_query($dblink, "INSERT INTO music_artists (uid, name, new) VALUES ('{$_SESSION['id']}', '', '1')") or die('fail');
+		$showartists = FALSE;
+		$artistitle = mysqli_fetch_array(mysqli_query($dblink, "SELECT name,id FROM music_artists WHERE new='1' AND uid='{$_SESSION['id']}'"));
+		$htmlartistname = $artistitle['name'];
+		$_POST['artist'] = $artistitle['id'];
+		mysqli_query($dblink, "UPDATE music_artists SET new='0' WHERE id='{$artistitle['id']}'");
+	}
+$pagetitle = 'Music'
+?>

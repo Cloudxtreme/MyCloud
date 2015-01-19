@@ -1,0 +1,47 @@
+<?php if(!isset($verify)){ exit(); } ?>
+<?php
+if (isset($_POST['newname']) || isset($_POST['newemail']))
+{
+	$newname = $_POST['newname'];
+	$newemail = $_POST['newemail'];
+	
+		$userdata = $user;
+		$sql2 = "SELECT * FROM users WHERE email='{$newemail}'";
+		$result2 = mysqli_query($dblink, $sql2);
+		if (mysqli_num_rows($result2) != 0 && $userdata['email'] != $newemail) {
+			$error = '<span class="redsmall">Really sorry but that e-mail is already taken</span>';
+		} else {
+			if(strlen($_POST['newpass']) < 1) {
+			$error = '<span class="redsmall">Really sorry you need to enter a password</span>';
+		} else {
+			if(strlen($_POST['newpass']) < 5) {
+			$error = '<span class="redsmall">Really sorry but your password needs<br>to be at least 5 characters</span>';
+		} else {
+			if(strlen($newname) < 1) {
+			$error = '<span class="redsmall">Really sorry you need to enter your fullname</span>';
+		} else {
+			if(strlen($newemail) == 0) {
+			$error = '<span class="redsmall">Really sorry you need to enter your e-mail address</span>';
+		} else {
+			$emailexplode = explode('@', $newemail);
+			if(isset($emailexplode[1])){ $emailexplode = explode('.', $emailexplode[1]); }
+			if (!isset($emailexplode[1])) {
+			$error = '<span class="redsmall">Really sorry but that\'s not a valid e-mail address</span>';
+		} else {
+			//start creating account
+			if ($_POST['newpass'] != 'password') { $newpassword = mysqli_escape_string($dblink, md5($_POST['newpass'])); } else { $newpassword = $user['password']; }
+			$newfullname = mysqli_escape_string($dblink, $newname);
+			$newemail	 = mysqli_escape_string($dblink, $newemail);
+			
+			mysqli_query($dblink, "UPDATE users SET password='$newpassword', fullname='$newfullname', email='$newemail' WHERE id='{$_SESSION['id']}'") or die("fail");
+			$sql = "SELECT * FROM users WHERE id='{$_SESSION['id']}'";
+			$result = mysqli_query($dblink, $sql);
+			$user = mysqli_fetch_array($result);
+			$error = 'Account updated';
+			//end creating account
+		}}}}}}
+} else {
+$error = '';
+}
+$pagetitle = 'Account';
+?>

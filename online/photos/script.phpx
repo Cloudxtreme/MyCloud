@@ -1,0 +1,33 @@
+<?php if(!isset($verify)){ exit(); } ?>
+<?php
+function tblclass($i)
+{
+if ($i%2==0){ return ' class="tblaltrow"'; } else { return ''; }
+}
+
+if (isset($_GET['album'])) { $mysqlartist = mysqli_escape_string($dblink, $_GET['album']); $artistfind = " AND album='$mysqlartist'"; } else { $artistfind = ''; }
+$sql = "SELECT id,name,uid,size,album FROM data_photos where uid='{$_SESSION['id']}'$artistfind";
+$sql = "	SELECT
+				 data_photos.id
+				,data_photos.name
+				,data_photos.uid
+				,data_photos.size
+				,data_photos.album
+				,photo_albums.name AS album
+					FROM data_photos
+					LEFT OUTER JOIN photo_albums
+						ON data_photos.album = photo_albums.id
+				where data_photos.uid='{$_SESSION['id']}'$artistfind";
+
+$result = mysqli_query($dblink, $sql) or die(mysqli_error($dblink));
+while ($imagedata = mysqli_fetch_array($result))
+{
+	$photo['name'] = $imagedata['name'];
+	$photo['size'] = $imagedata['size'];
+	$photo['id']   = $imagedata['id'];
+	$albuminfo = mysqli_fetch_array(mysqli_query($dblink, "SELECT * FROM photo_albums where id='{$imagedata['album']}' AND uid='{$_SESSION['id']}'"));
+	$photo['album'] = $albuminfo['name'];
+$photos[] = $photo;
+}
+$pagetitle = 'Photos';
+?>

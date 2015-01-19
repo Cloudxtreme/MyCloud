@@ -1,0 +1,12 @@
+<?php
+require('/var/offline/inspector.php');
+$verify = TRUE;
+require('/var/offline/start.php');
+require('script.phpx');
+require('/var/offline/top.php');
+?>
+<h2>Welcome to MyCloud <?php echo $user['fullname']; ?>!</h2>
+To begin click on one of the icons at the top of the page
+<?php
+require('/var/offline/bottom.php');
+?>

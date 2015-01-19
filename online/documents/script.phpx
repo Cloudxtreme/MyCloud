@@ -1,0 +1,82 @@
+<?php if(!isset($verify)){ exit(); } ?>
+<?php
+function tblclass($i)
+{
+if ($i%2==0){ return ' class="tblaltrow"'; } else { return ''; }
+}
+
+function dategen($getdate) {
+	if ($getdate == '0000-00-00 00:00:00'){ return 'Never'; }
+	$unixdate = strtotime($getdate);
+	if (date("Ymd", $unixdate) == date("Ymd"))
+	{ //it is the same day
+		return 'Today, '.date("g:i a", $unixdate);
+	} elseif (date("Ymd", $unixdate) == date("Ymd", strtotime('-1 day')))
+	{ //it was edited yesterday
+		return 'Yesterday, '.date("g:i a", $unixdate);
+	} elseif (date("YW", $unixdate) == date("YW"))
+	{ //within the last week
+		return date("l, g:i a", $unixdate);
+	} elseif (date("Y", $unixdate) == date("Y"))
+	{ //within the last year
+		return date("d/m, g:i a", $unixdate);
+	} else {
+		return date("d/m/Y, g:i a", $unixdate);
+	}
+}
+
+if (isset($_POST['docid']) && is_numeric($_POST['docid'])) {
+	$docid = mysqli_real_escape_string($dblink, $_POST['docid']);
+	$docname =  mysqli_real_escape_string($dblink, $_POST['docname']);
+	$docdata =  mysqli_real_escape_string($dblink, $_POST['docdata']);
+	$datetime = date("Y-m-d H:i:s");
+	$sql = "UPDATE data_documents SET name = '$docname', data = '$docdata', edited = '$datetime' WHERE id = '$docid' AND uid = '{$_SESSION['id']}'";
+	mysqli_query($dblink, $sql);
+	$saved = 'Last saved: '.date("g:i a");
+	$_POST['edit'] = $_POST['docid'];
+	$_POST['Open'] = 'Open';
+} else {
+	$saved = '';
+}
+//start search form
+$searchform =  new htmlform('documentsearch');
+$searchform -> form -> addattribute('id', 'documentsearch');
+$searchform -> form -> addclass('floatright');
+$searchform -> addinput('search', 'text', 'Search');
+$searchform -> addinputattribute('search', 'autocomplete', 'off');
+$searchform -> addinputclass('search', 'greyinput');
+$searchform -> addinputclass('search', 'searchinput');
+if ($searchform->ispostback)
+{
+	$result = $searchform->postback->getvalue('search');
+	if ($result != '')
+	{
+		$searchform->postback->removeinputclass('search', 'greyinput');
+		$result = mysqli_escape_string($dblink, $result);
+		$searchsql = " AND name LIKE '%$result%'";
+	} else {
+		$searchform->postback->setvalue('search', 'Search');
+		$searchform->postback->addinputclass('search', 'greyinput');
+		$searchsql = '';
+	}
+} else {
+	$searchsql = '';
+}
+$searchformcode = $searchform->__tostring();
+//end search form
+
+$showdocs = TRUE;
+$allowedorder = array("name", "edited", "opened", "created", "size");
+if (!isset($_GET['docorder']) || !in_array($_GET['docorder'], $allowedorder)) { $_GET['docorder'] = 'edited'; }
+$sql = "SELECT id,name,edited,opened,created,size FROM data_documents WHERE uid='{$_SESSION['id']}'$searchsql ORDER BY hasopened,{$_GET['docorder']} DESC";
+$result = mysqli_query($dblink, $sql);
+if(mysqli_num_rows($result) > 0)
+{
+	while ($documentdata = mysqli_fetch_array($result))
+	{
+		$docs[] = $documentdata;
+	}
+}
+$nodocsmessage = 'You have no documents!';
+$pagetitle = 'Documents';
+?>

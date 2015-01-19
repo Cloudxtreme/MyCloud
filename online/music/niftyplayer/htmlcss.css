@@ -1,0 +1,111 @@
+	#niftyDiv { 
+		border: 1px solid #000;
+		width: 25em; /* wide enough for longest song title */
+	}
+	#niftyControls { 
+		position: relative;
+		border: 2px solid #4c4c4c; 
+		background-color: #666666; 
+		/* width: 464px; */
+		height: 30px;
+		line-height: 30px;
+	}
+	obj#niftyPlayer { 
+		height: 1px;
+	}
+	#niftyControls input { 
+		border: 2px solid #666666; /* masked against background until input has focus*/
+		position: absolute;
+		background-position: center center;
+		background-repeat: no-repeat;
+	}
+	#niftyControls input:focus, #niftyControls input:hover, #niftyControls input:active { 
+		border-color: #ffff00 !important; /* yellow */
+	}
+	input#playpause {
+		top: 0px;
+		left: 0px;
+		width: 34px;
+		height: 30px;
+		background-color: transparent;
+		background-image: url('images/audio_play.gif');
+		color: transparent;
+		border-right-color: #848484; 
+	}
+	input#previous {
+		top: 0px;
+		left: 40px;
+		width: 34px;
+		height: 30px;
+		background-color: transparent;
+		background-image: url('images/audio_rewind.gif');
+		color: transparent;
+	}
+	input#next {
+		top: 0px;
+		left: 80px;
+		width: 34px;
+		height: 30px;
+		background-color: transparent;
+		background-image: url('images/audio_forward.gif');
+		color: transparent;
+	}
+	input#stop {
+		top: 0px;
+		left: 120px;
+		width: 34px;
+		height: 30px;
+		background-color: transparent;
+		background-image: url('images/audio_stop.gif');
+		color: transparent;
+	}
+	#niftyPlaylist { 
+		font-size: 0.9em;
+		list-style-type: none;
+		margin: 0;
+		padding: 0;
+	}
+	#niftyPlaylist li { 
+		margin: 5px;
+		padding: 5px;
+		background-color: #eee;
+	}
+	#niftyPlaylist li.focus { 
+		background-color: #cfc;
+		font-weight: bold;
+	}
+	#niftyPlaylist a { 
+		margin: 0;
+		padding: 5px;
+		width: 100%;
+		color: #333;
+		text-decoration: none;
+	}
+	#nowPlaying { 
+		margin: 5px;
+		padding: 0.5em;
+		text-align: center;
+		font-weight: bold;
+		font-size: 1.1em;
+		background-color: #cfc;
+	}
+	#nowPlaying span { 
+		font-size: 0.9em;
+	}
+	span#status { 
+		top: 0px;
+		float: right;
+		padding-right: 5px;
+		height: 30px;
+		color: #ddd;
+		font-style: italic;
+		background-color: transparent;
+	}
+	.offscreen { 
+		position:absolute;
+		left:-10000px;
+		top:auto;
+		width:1px;
+		height:1px;
+		overflow:hidden;
+	}

@@ -1,0 +1,50 @@
+<?php if(!isset($verify)){ exit(); } ?>
+<?php
+	@session_start();
+	if (isset($_SESSION['id'])) {
+		require($_SERVER['DOCUMENT_ROOT'].'/../offline/dbconex.php');
+		$lastpage = mysqli_fetch_array(mysqli_query($dblink, "SELECT lastpage FROM users WHERE id='{$_SESSION['id']}'"));
+		$lastpage = $lastpage['lastpage'];
+		header('location: '.$lastpage);
+		exit();
+	}
+	
+	$login 	= new htmlform('login');
+	$login -> addinput('username', 'text', 'Username');
+	$login -> addinputattribute('username', 'onfocus', "if(this.value=='Username') this.value = ''; if(this.value=='') this.style.color = '#000000';");
+	$login -> addinputattribute('username', 'onblur', "if(this.value=='') this.value='Username'; if(this.value=='Username') this.style.color = '#888888';");
+	
+	$login -> addinput('password', 'password');
+	$login -> addinputattribute('password', 'id', 'password-password');
+	
+	$login -> addinput('passwordclear', 'text', 'Password');
+	$login -> addinputattribute('passwordclear', 'id', 'password-clear');
+	
+	$login -> addinput('submit', 'submit', 'Login');
+	$login -> addinputclass('submit', 'submit');
+	
+	if ($login->ispostback) {
+		require($_SERVER['DOCUMENT_ROOT'].'/../offline/dbconex.php');
+		$username = mysqli_escape_string($dblink, $login->postback->getvalue('username'));
+		$sql = "SELECT * FROM users WHERE username='{$username}'";
+		$result = mysqli_query($dblink, $sql);
+		$userdata = mysqli_fetch_array($result);
+		if ($userdata['password'] == md5( $login->postback->getvalue('password'))) 
+		{
+			$_SESSION['id'] = $userdata['id'];
+			$lastpage = mysqli_fetch_array(mysqli_query($dblink, "SELECT lastpage FROM users WHERE id='{$_SESSION['id']}'"));
+			$lastpage = $lastpage['lastpage'];
+			header('location: '.$lastpage);
+		} else {
+			$title = '<span class="red">Invalid user or password</span><br><a class="small" href="/forgot">Forgot username or password?</a>';
+			$login->postback->addinputclass('username', 'black');
+			$login->postback->setvalue('password', '');
+		}
+	} else {
+		$title = 'Welcome to My Cloud';
+	}
+	
+	$logintop = $login -> top();
+	$pagetitle = 'Login';
+	$config['bypassvalidation'] = TRUE;
+?>

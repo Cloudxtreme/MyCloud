@@ -1,0 +1,16 @@
+body				{ background-color:#999; margin:0; padding:0; }
+.tblaltrow 			{ background-color:#888; }
+table				{ border-collapse:collapse; }
+.title				{ font-weight:bold; }
+
+tr					{ width:100%; }
+#albumartist		{ width:350px; }
+#songname			{ width:70%; }
+
+#player audio		{ width:100%; margin-top:10px; margin-bottom:10px; }
+
+#buttons			{ margin-top:20px; margin-left:20px; margin-bottom:10px; }
+#buttons #musicplay	{ }
+#buttons #next		{ margin-left:20px; }
+
+#menuspace			{ width:100%; height:20px; }

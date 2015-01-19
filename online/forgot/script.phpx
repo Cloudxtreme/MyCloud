@@ -1,0 +1,22 @@
+<?php if(!isset($verify)){ exit(); } ?>
+<?php
+if (isset($_POST['email'])){
+	require($_SERVER['DOCUMENT_ROOT'].'/../offline/dbconex.php');
+	$sql = "SELECT * FROM users WHERE email='{$_POST['email']}'";
+	$result = mysqli_query($dblink, $sql);
+	$user = mysqli_fetch_array($result);
+	$newpassword = substr(md5(rand(0,9999999)), 0, 8);
+	$escapedpass = mysqli_escape_string($dblink, md5($newpassword));
+	$sql = "UPDATE users SET password='$escapedpass' WHERE email='{$_POST['email']}'";
+	$result = mysqli_query($dblink, $sql);
+	$message = "Your My Cloud password has been reset\nyou can now login with the username \"{$user['username']}\" and the password \"$newpassword\"\nhttp://mycloud.jyelewis.com/\n\n\nPowered by My Cloud";
+	$to      = $_POST['email'];
+	$subject = "{$user['fullname']}'s account details";
+	$headers = 'From: My Cloud <noreply@jyelewis.com>' . "\r\n" .
+    'X-Mailer: PHP/' . phpversion();
+	mail($to, $subject, $message, $headers);
+	$showform = FALSE;
+} else {
+	$showform = TRUE;
+}
+?>

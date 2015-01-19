@@ -1,0 +1,45 @@
+<?php if(!isset($verify)){ exit(); } ?>
+<?php
+require($_SERVER['DOCUMENT_ROOT'].'/../offline/dbconex.php');
+$error = 'woops, something went wrong';
+if (isset($_GET['documentid']) && isset($_POST['documentpassword'])) {
+		$docid = mysqli_escape_string($dblink, $_GET['documentid']);
+		$docpass = $_POST['documentpassword'];
+		$sql = "SELECT documentid,password FROM shared_documents WHERE urlid='{$docid}'";
+		$result = mysqli_query($dblink, $sql);
+		if (mysqli_num_rows($result) == 1)
+		{
+			$documentid = mysqli_fetch_array($result);
+			if ($documentid['password'] == $docpass){
+				$sql2 = "SELECT * FROM data_documents WHERE id='{$documentid['documentid']}'";
+				$result2 = mysqli_query($dblink, $sql2);
+				$document = mysqli_fetch_array($result2);
+				
+				$documentname = $document['name'];
+				$documentdata = $document['data'];
+				$pagetitle = $document['name'];
+			} else {
+			$passerror = '<center><span style="color:#aa0000;font-size:15px;">incorrect password</span><center>';
+			unset($_POST['documentpassword']);
+			}
+		} else {
+		$error = 'Document not found, it may have been deleted by the owner';
+		}
+	} else {
+		unset($pagetitle);
+	}
+	
+if (isset($_GET['documentid']) && !isset($_POST['documentpassword'])) {
+	$docid = mysqli_escape_string($dblink, $_GET['documentid']);
+	$sql = "SELECT documentid,password FROM shared_documents WHERE urlid='{$docid}'";
+	$result = mysqli_query($dblink, $sql);
+	if (mysqli_num_rows($result) == 1)
+	{
+		$displaypass = TRUE;
+	} else {
+		$error = 'Document not found!, It may have been deleted or you have the wrong url';
+	}
+}
+	
+	
+?>

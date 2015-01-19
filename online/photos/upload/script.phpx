@@ -1,0 +1,46 @@
+<?php if(!isset($verify)){ exit(); } ?>
+<?php
+	if (isset($_GET['albumid'])) { $toselect = $_GET['albumid']; }
+  	if (isset($_FILES['uploaded_file']['type'])){
+  	$toselect = $_POST['album'];
+  	$allowedmimes = array('image/jpeg', 'image/gif', 'image/png');
+  		if(in_array($_FILES['uploaded_file']['type'], $allowedmimes))
+  		{
+  		include($_SERVER['DOCUMENT_ROOT'].'/../offline/smart_resize_image.function.php');
+  		$name = $dblink->real_escape_string($_POST['photoname']);
+  		$album = $dblink->real_escape_string($_POST['album']);
+  		$description = $dblink->real_escape_string($_POST['description']);
+        $data = $dblink->real_escape_string(file_get_contents($_FILES['uploaded_file']['tmp_name']));
+        smart_resize_image(file_get_contents($_FILES['uploaded_file']['tmp_name']), '205', '0');
+        $thumbnail = mysqli_escape_string($dblink, file_get_contents($file));
+        unlink($file);
+        $size = intval($_FILES['uploaded_file']['size']);
+        // Create the SQL query
+        if ($datausage['remaining'] > $size)
+        	{
+        	$query = "
+           	 INSERT INTO data_photos (
+           	     `uid`, `name`, `size`, `album`, `data`, `description`, `thumbnail`
+           	 )
+           	 VALUES (
+           	     '{$_SESSION['id']}', '{$name}', '{$size}', '{$album}', '{$data}', '{$description}', '{$thumbnail}'
+           	 )";
+        	mysqli_query($dblink, $query);
+        	$error = 'photo uploaded!';
+        	} else { $error = 'You do not have enough space to upload that file'; }
+    	} else { $error = 'only image files can be uploaded'; }
+    	$backlink = '/photos';
+    } else {
+		if (isset($_SERVER['HTTP_REFERER'])){ $backlink = $_SERVER['HTTP_REFERER']; } else { $backlink = '/photos'; }
+	}
+
+
+$sql = "SELECT * FROM photo_albums WHERE uid='{$_SESSION['id']}'";
+$result = mysqli_query($dblink, $sql);
+while ($album = mysqli_fetch_array($result))
+{
+$albums[] = $album;
+}
+
+$pagetitle = 'Photos';
+?>

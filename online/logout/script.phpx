@@ -1,0 +1,11 @@
+<?php if(!isset($verify)){ exit(); } ?>
+<?php
+if (isset($_SESSION['id']))
+{
+mempage($lastpageold);
+unset($_SESSION['id']);
+header('location:/');
+} else {
+header('location:/');
+}
+?>

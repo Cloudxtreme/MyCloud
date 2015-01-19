@@ -1,0 +1,11 @@
+<?php if(!isset($verify)){ exit(); } ?>
+<?php
+@session_start();
+if (isset($_SESSION['id']))
+{
+	$logedin = TRUE;
+} else {
+	$logedin = FALSE;
+}
+$pagetitle = 'About';
+?>

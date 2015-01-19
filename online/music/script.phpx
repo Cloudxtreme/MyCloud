@@ -1,0 +1,91 @@
+<?php if(!isset($verify)){ exit(); } ?>
+<?php
+function tblclass($i)
+{
+if ($i%2==0){ return ' class="pointer tblaltrow"'; } else { return ' class="pointer"'; }
+}
+
+function dategen($getdate) {
+	if ($getdate == '0000-00-00 00:00:00'){ return 'Never'; }
+	$unixdate = strtotime($getdate);
+	if (date("Ymd", $unixdate) == date("Ymd"))
+	{ //it is the same day
+		return 'Today, '.date("g:i a", $unixdate);
+	} elseif (date("Ymd", $unixdate) == date("Ymd", strtotime('-1 day')))
+	{ //it was edited yesterday
+		return 'Yesterday, '.date("g:i a", $unixdate);
+	} elseif (date("YW", $unixdate) == date("YW"))
+	{ //within the last week
+		return date("l, g:i a", $unixdate);
+	} elseif (date("Y", $unixdate) == date("Y"))
+	{ //within the last year
+		return date("d/m, g:i a", $unixdate);
+	} else {
+		return date("d/m/Y, g:i a", $unixdate);
+	}
+}
+
+$allowedorder = array("name", "artist", "album", "lastplayed", "uploaded", "size");
+if (!isset($_GET['order']) || !in_array($_GET['order'], $allowedorder)) { $_GET['order'] = 'artist'; }
+if (isset($_GET['artist'])) { $mysqlartist = mysqli_escape_string($dblink, $_GET['artist']); $artistfind = " AND artist='$mysqlartist'"; } else { $artistfind = ''; }
+
+//start search form
+$searchform =  new htmlform('musicsearch');
+$searchform -> form -> addattribute('id', 'documentsearch');
+$searchform -> form -> addclass('floatright');
+$searchform -> addinput('search', 'text', 'Search');
+$searchform -> addinputattribute('search', 'autocomplete', 'off');
+$searchform -> addinputclass('search', 'greyinput');
+$searchform -> addinputclass('search', 'searchinput');
+if ($searchform->ispostback)
+{
+	$result = $searchform->postback->getvalue('search');
+	if ($result != '')
+	{
+		$searchform->postback->removeinputclass('search', 'greyinput');
+		$result = mysqli_escape_string($dblink, $result);
+		$searchsql = "	   data_music.uid='{$_SESSION['id']}'$artistfind AND data_music.name LIKE '%$result%'
+						OR data_music.uid='{$_SESSION['id']}'$artistfind AND music_artists.name LIKE '%$result%'
+						OR data_music.uid='{$_SESSION['id']}'$artistfind AND data_music.album LIKE '%$result%'";
+	} else {
+		$searchform->postback->setvalue('search', 'Search');
+		$searchform->postback->addinputclass('search', 'greyinput');
+		$searchsql = "data_music.uid='{$_SESSION['id']}'$artistfind";
+	}
+} else {
+	$searchsql = "data_music.uid='{$_SESSION['id']}'$artistfind";
+}
+$searchformcode = $searchform->__tostring();
+//end search form
+
+
+//start info select SQL
+$sql = "	SELECT
+				 data_music.id
+				,data_music.name
+				,data_music.uid
+				,data_music.size
+				,data_music.uploaded
+				,data_music.lastplayed
+				,data_music.album
+				,music_artists.name AS artist
+					FROM data_music
+					LEFT OUTER JOIN music_artists
+						ON data_music.artist = music_artists.id
+				WHERE $searchsql ORDER BY {$_GET['order']}, data_music.album, data_music.name";
+$result = mysqli_query($dblink, $sql) or die($sql);
+$i = 0;
+while ($song = mysqli_fetch_array($result))
+{
+	$song['jscriptid'] = $i;
+	if ($song['artist'] != ''){
+		$song['jscriptname'] = $song['name'].' - '.$song['artist'];
+	} else {
+		$song['jscriptname'] = $song['name'];
+	}
+$songs[] = $song;
+$i++;
+}
+if (isset($_GET['artist'])) { $sortartist = '?artist='.$_GET['artist'].'&'; } else { $sortartist = '?'; }
+$pagetitle = 'Music';
+?>
